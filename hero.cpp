@@ -22,6 +22,7 @@ int main() {
     }
     else if (hasCorrectSyntax(mySong)){
         cout <<"The bad beat is the "<<badBeat<<"th "<<endl;
+        cout <<"Number returned: "<<int(translateSong(mySong, myInstruct, badBeat))<<endl;
     }
     else{
         cout <<"Incorrect Syntax"<<endl;
@@ -48,7 +49,7 @@ bool hasCorrectSyntax(string song){
             if (song[i+1]=='/'){
                 correctness=true;
             }
-            else if (song[i+1]=='/' && !isdigit(song[i+2]) && i!=song.size()-2){
+            else if (isdigit(song[i+1]) && !isdigit(song[i+2]) && i!=song.size()-2){
                 correctness=true;
             }
             else{
@@ -77,11 +78,12 @@ bool isTranslatable(string song){
                         return false;
                     }
                     
-                    for(int j=1;j<digit;j++){
+                    for(int j=2;j<=digit;j++){
                         if(i+1+digit>song.size()-1 || song[j+i]!='/'){
                             return false;
                         }
                     }
+                    i++; //skip the next digit
                     
                 }
                 else{
@@ -125,7 +127,6 @@ int translateSong(string song, string& instructions, int& badBeat){
     }
     
     if(! hasCorrectSyntax(song)){
-        //ONLY FOR TESTING!!!
         return 1;
     }
     
@@ -140,9 +141,9 @@ int translateSong(string song, string& instructions, int& badBeat){
                 }
                     
                 else if(i+1+digit<=song.size()-1) {
-                    for(int j=1;j<digit;j++){
+                    for(int j=2;j<digit;j++){
                         if(song[j+i]!='/'){
-                            badBeat=j+i;
+                            badBeat=numBeat(song.substr(0,i+j+1))+1;
                             return 3;
                         }
                     }
@@ -152,37 +153,37 @@ int translateSong(string song, string& instructions, int& badBeat){
                     badBeat=int(song.size())+1;
                     return 4;
                 }
-                    
+                i++;
             }
-            digit=song[i]-48;
-            if(digit<2){
-                badBeat=numBeat(song.substr(0,i+1))+1;
-                return 2;
-            }
-            else if(i+digit<=song.size()-1) {
-                for(int j=1;j<digit;j++){
-                    if(song[j+i]!='/'){
-                        badBeat=j+i;
-                        return 3;
+            else if (!isdigit(song[i+1])){
+                digit=int(song[i])-48;
+                if(digit<2){
+                    badBeat=numBeat(song.substr(0,i+1))+1;
+                    return 2;
+                }
+                else if(i+digit<=song.size()-1) {
+                    for(int j=1;j<=digit;j++){
+                        if(song[j+i]!='/'){
+                            badBeat=numBeat(song.substr(0,i+j+1))+1;
+                            return 3;
+                        }
+                        else if(i+1+digit>song.size()-1){
+                            badBeat=int(song.size())+1;
+                            return 4;
+                        }
                     }
                 }
-            }
-            else if(i+1+digit>song.size()-1){
-                badBeat=int(song.size())+1;
-                return 4;
             }
         }
     }
     return 0;
 }
-
 string translation(string song){ //since we use this function only when song is translatable, we don't need to worry about the erraneous situations
     int digit;
     string newSong = "";
     if (song==""){
         return song;
     }
-    
     else{
         int i=0;
         while(i<song.size()){
