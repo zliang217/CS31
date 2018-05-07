@@ -153,7 +153,7 @@ int translateSong(string song, string& instructions, int& badBeat){
                 }
                 
                 else if(i+1+digit>song.size()-1){ //end prematurely
-                    badBeat=int(song.size())+1;
+                    badBeat=numBeat(song)+1;
                     return 4;
                 }
                 i++;
@@ -170,16 +170,16 @@ int translateSong(string song, string& instructions, int& badBeat){
                             badBeat=numBeat(song.substr(0,i+j+1))+1;
                             return 3;
                         }
-                        else if(i+1+digit>song.size()-1){
-                            badBeat=int(song.size())+1;
-                            return 4;
-                        }
                     }
+                }
+                else if(i+1+digit>song.size()-1){
+                            badBeat=numBeat(song)+1;
+                            return 4;
                 }
             }
         }
     }
-    return 0;
+    return 5;
 }
 string translation(string song){ //since we use this function only when song is translatable, we don't need to worry about the erraneous situations
     int digit;
@@ -188,8 +188,7 @@ string translation(string song){ //since we use this function only when song is 
         return song;
     }
     else{
-        int i=0;
-        while(i<song.size()){
+        for(int i=0; i<song.size(); i++){
             if (isColor(song[i])){
                 if(isdigit(song[i+1])){
                     if(isdigit(song[i+2])){
@@ -197,18 +196,20 @@ string translation(string song){ //since we use this function only when song is 
                         for (int j=0; j<digit; j++){
                             newSong+=toupper(song[i]);
                         }
-                        i=i+2+digit+1;
+                        i=i+2+digit;
                     }
                     else{
                         digit=int(song[i+1])-48;
                         for (int j=0; j<digit; j++){
                             newSong+=toupper(song[i]); //sustained notes are capitalized
                         }
-                        i=i+1+digit+1;
+                        i=i+1+digit;
                     }
                 }
-                newSong+=tolower(song[i]); //normal notes are lower case
-                i+=2;
+                else{
+                    newSong+=tolower(song[i]); //normal notes are lower case
+                    i+=2;
+                }
             }
             
             else if(song[i]=='/'){
