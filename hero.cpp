@@ -216,7 +216,6 @@ string translation(string song){ //since we use this function only when song is 
             
             else if(song[i]=='/'){
                 newSong+='x';
-                i++;
             }
         }
         return newSong;
