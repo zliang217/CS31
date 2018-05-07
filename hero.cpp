@@ -19,6 +19,7 @@ int main() {
     translateSong(mySong, myInstruct, badBeat);
     if(isTranslatable(mySong)){
         cout <<myInstruct<<endl;
+        cout <<"Numbers returned: "<<int(translateSong(mySong, myInstruct, badBeat))<<endl;
     }
     else if (hasCorrectSyntax(mySong)){
         cout <<"The bad beat is the "<<badBeat<<"th "<<endl;
@@ -26,6 +27,7 @@ int main() {
     }
     else{
         cout <<"Incorrect Syntax"<<endl;
+        cout <<"Numbers returned: "<<int(translateSong(mySong, myInstruct, badBeat))<<endl;
     }
 }
 
