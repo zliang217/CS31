@@ -208,7 +208,7 @@ string translation(string song){ //since we use this function only when song is 
                 }
                 else{
                     newSong+=tolower(song[i]); //normal notes are lower case
-                    i+=2;
+                    i++;
                 }
             }
             
