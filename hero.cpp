@@ -139,7 +139,7 @@ int translateSong(string song, string& instructions, int& badBeat){
         if(isdigit(song[i])){
             int digit;
             if(isdigit(song[i+1])) { //no need to worry about boundary problems since it has correct syntax already
-                digit=10*(song[i]-48)+(song[i+1]-48);
+                digit=10*int(song[i]-48)+int(song[i+1]-48);
                 if(digit<2){
                     badBeat=numBeat(song.substr(0,i+2))+1; //song[i+2] will definitely be / since song doesn't end prematurely
                     return 2;
