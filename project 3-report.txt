@@ -2,16 +2,71 @@ Part I: Obstacles encountered
 With the introduction of function, the logic involved in the program becomes much more complicated. Multiple compounded if statements and for loops make me scratch my head, and many times a wrong placement of a statement causes an infinite loop. Also, how to properly design a function to reduce repetition of code is also not that easy. I am a math undergraduate and I find the process of doing a project much like proving a big theorem: you break the whole thing into small chunks that build up the solution.
 
 Part II: Cases Tested
+This is a copy of code I wrote for testing purpose:
+
+int main() {
+    string mySong;
+    cout << "Enter your song: ";
+    getline(cin, mySong);
+    string myInstruct;
+    int badBeat;
+    translateSong(mySong, myInstruct, badBeat);
+    if(isTranslatable(mySong)){
+        cout <<myInstruct<<endl;
+        cout <<"Number returned: "<<int(translateSong(mySong, myInstruct, badBeat))<<endl;
+    }
+    else if (hasCorrectSyntax(mySong)){
+        cout <<"The bad beat is the "<<badBeat<<"th "<<endl;
+        cout <<"Number returned: "<<int(translateSong(mySong, myInstruct, badBeat))<<endl;
+    }
+    else{
+        cout <<"Incorrect Syntax"<<endl;
+        cout <<"Number returned: "<<int(translateSong(mySong, myInstruct, badBeat))<<endl;
+    }
+}
+
 Case 0: song="" (empty string)
+Result: 
+
+Number returned: 0
+
 Case 1: song="qq" (Incorrect Syntax, 'q' is not a valid color)
+Result:
+Incorrect Syntax
+Number returned: 1
+
 Case 2: song="gg" (Incorrect Syntax, "gg" doesn't form a complete beat which ends with '/')
+Result:
+Incorrect Syntax
+Number returned: 1
+
 Case 3: song="g999/" (Incorrect Syntax, 3 digits, which is not allowed)
+Result:
+Incorrect Syntax
+Number returned: 1
+
 Case 4: song="o/r3//y/" (Correct Syntax but not translatable, abrupt beat appears when sustained note is in effect)
+Result:
+The bad beat is the 4th 
+Number returned: 3
+
 Case 5: song="o//y/r3//" (Correct Syntax but not translatable, ends prematurely)
+Result:
+The bad beat is the 6th 
+Number returned: 4
+
 Case 6: song="g1/" (Correct Syntax but not translatable, sustained note of length 0 or 1)
-Case 7: song="r//g3///y10//////////o/" (Translatable)
+Result:
+The bad beat is the 1th 
+Number returned: 2
+
+Case 7: song="r//g3///y10//////////o/Y/" (Translatable)
+Result:
+rxGGGYYYYYYYYYYoy
+Number returned: 0
 
 Part III: Pseudocode
+
 bool hasCorrectSyntax (string song){
 	if song is empty, return true;
 	else if the first char is neither '/' nor a color, return false;
@@ -29,8 +84,23 @@ bool hasCorrectSyntax (string song){
 	return true if it gets to this line;
 }
 
+bool isTranslatable(string song){
+	if the song doesn't have correct syntax, return false;
+	else, repeatedly:
+		if the char is a digit,
+			if the next char is also a digit, get the value corresponding to the two digits;
+				if the value < 2, return false;
+				else, 
+					if either the sustained note ends prematurely or other beat sneaks in when sustained note is in effect, return false;
+			if the next char is not a digit, get the value corresponding to the digit;
+				if the value < 2, return false;
+				else, 
+					if either the sustained note ends prematurely or other beat sneaks in when sustained note is in effect, return false;
+	if it gets to this line, return true;
+}
+
 int translateSong (string song, string& instructions, int& badBeat){
-	if the song is translatable, set instruction to translation(song);//a function I wrote myself
+	if the song is translatable (tested by isTranslatable(song)), set instruction to translation(song);//a function I wrote myself
 	if the song doesn’t have correct syntax, return 1;
 	if the two cases above are not got to,
 		repeatedly:
@@ -64,9 +134,3 @@ else, repeatedly:
 	if the char is ‘/‘, add ‘x’ to newSong, and move to the next beat; 
 return newSong;
 }
-
-
-
-
-
-
