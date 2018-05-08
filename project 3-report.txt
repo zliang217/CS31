@@ -1,0 +1,72 @@
+Part I: Obstacles encountered
+With the introduction of function, the logic involved in the program becomes much more complicated. Multiple compounded if statements and for loops make me scratch my head, and many times a wrong placement of a statement causes an infinite loop. Also, how to properly design a function to reduce repetition of code is also not that easy. I am a math undergraduate and I find the process of doing a project much like proving a big theorem: you break the whole thing into small chunks that build up the solution.
+
+Part II: Cases Tested
+Case 0: song="" (empty string)
+Case 1: song="qq" (Incorrect Syntax, 'q' is not a valid color)
+Case 2: song="gg" (Incorrect Syntax, "gg" doesn't form a complete beat which ends with '/')
+Case 3: song="g999/" (Incorrect Syntax, 3 digits, which is not allowed)
+Case 4: song="o/r3//y/" (Correct Syntax but not translatable, abrupt beat appears when sustained note is in effect)
+Case 5: song="o//y/r3//" (Correct Syntax but not translatable, ends prematurely)
+Case 6: song="g1/" (Correct Syntax but not translatable, sustained note of length 0 or 1)
+Case 7: song="r//g3///y10//////////o/" (Translatable)
+
+Part III: Pseudocode
+bool hasCorrectSyntax (string song){
+	if song is empty, return true;
+	else if the first char is neither '/' nor a color, return false;
+	repeatedly (from 1 to the second last digit):
+		if the char is '/', true and move to the next char;
+		else if the char is color,
+			if the next char is neither ‘/‘ nor a digit, return false;
+			else true and move to the next char;
+		else if the char is a digit, 
+			if the next char is ‘/‘, true and move to the next char;
+			else if the next char is also a digit, is not followed by a digit, and is not out of bound, true and move to the next char;
+			else return false;
+		else (the char is not ‘/‘, not color, and not digit), return false;
+	manually check if the last char is not a '/', return false;
+	return true if it gets to this line;
+}
+
+int translateSong (string song, string& instructions, int& badBeat){
+	if the song is translatable, set instruction to translation(song);//a function I wrote myself
+	if the song doesn’t have correct syntax, return 1;
+	if the two cases above are not got to,
+		repeatedly:
+			if the char is a digit, 
+				if the next char is also a digit, get the corresponding value of the two chars;
+					if the value < 2, badBeat is set to the number of this beat, and return 2;
+					else if the number of characters after the digit > the value of the digit, repeatedly:
+						if any char is not ‘/‘ when sustained note is in effect, set badBeat to this beat, and return 3;
+					else if the number of characters after the digit < the value of the digit, set badBeat to number of beats in this song plus one (end prematurely) and return 4;		
+				else, get the corresponding value of this digit;
+					if the value < 2, badBeat is set to the number of this beat, and return 2;
+					else if the number of characters after the digit > the value of the digit, repeatedly:
+						if any char is not ‘/‘ when sustained note is in effect, set badBeat to this beat, and return 3;
+					else if the number of characters after the digit < the value of the digit, set badBeat to number of beats in this song plus one (end prematurely) and return 4;
+}
+
+string translation (string song){
+declare string newSong;
+if song is empty, return song itself (which is empty);
+else, repeatedly:
+	if the char is color, 
+		if the char after it is a digit and followed by a digit, get the corresponding value of the two chars;
+			repeatedly: 
+				add the uppercase of the color char the value of two char times to newSong;
+				move to the char after these sustained notes;
+		if the char after it is a digit but is not followed by a digit, get the corresponding value of this one char;
+			repeatedly: 
+				add the uppercase of the color char the value of two char times to newSong;
+				move to the char after these sustained notes;
+		else, add the lowercase of the color char to newSong, and move to the next beat;
+	if the char is ‘/‘, add ‘x’ to newSong, and move to the next beat; 
+return newSong;
+}
+
+
+
+
+
+
