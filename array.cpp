@@ -11,10 +11,12 @@ int positionOfMin(const string a[], int n);
 int moveToEnd(string a[], int n, int pos);
 int moveToBeginning(string a[], int n, int pos);
 int findDifference(const string a1[], int n1, const string a2[], int n2);
+int maxLength(string a[], int n); //a function I created myself, used to get the maximum length of consecutive identical strings
 int eliminateDups(string a[], int n);
 bool subsequence(const string a1[], int n1, const string a2[], int n2);
-int makeMerger(const string a1[], int n1, const string a2[], int n2,
-               string result[], int max);
+bool nondec(string a[], int n);//a function I created myself, to test whether a given array of strings are sorted in decending order
+int makeMerger(const string a1[], int n1, const string a2[], int n2, string result[], int max);
+void insert(string a[], string s, int n, int pos); //a function I created myself, used to insert a string to a given array, once at a call
 int separate(string a[], int n, string separator);
 
 int main() {
@@ -85,10 +87,10 @@ int moveToEnd(string a[], int n, int pos){
     return pos;
 }
 
-int moveToBeginning(string a[], int n, int pos){
+int moveToBeginning(string a[], int n, int pos){ //interestingly n is not used in this function, not sure whether I made a mistake here
     string elim=a[pos];
-    for (int i=0; i<pos; i++){
-        a[i+1]=a[i];
+    for (int i=pos; i>0; i--){
+        a[i]=a[i-1];
     }
     a[0]=elim;
     return pos;
@@ -104,34 +106,103 @@ int findDifference(const string a1[], int n1, const string a2[], int n2){
     return n+1;
 }
 
-int eliminateDups(string a[], int n){
-    int begin;
-    int end;
-    for (int i=0; i<n; i++){
-        if(findRun(a, n, a[i], begin, end)){
-            for (int j=begin; j<=end){
-                a[j]=a[j+begin-end]
-            }
+int maxLength(string a[], int n){
+    int begin=0;
+    int end=0;
+    int len = end - begin + 1;
+    int max = 1;
+    int i = 0;
+    while(i<n){
+        findRun(a, n, a[i], begin, end);
+        if (len>max){
+            max=len;
         }
+        i+=len;
+    }
+    return max;
+}
+
+int eliminateDups(string a[], int n){
+    int begin = 0;
+    int end = 0;
+    int last = 0;
+    int i = 0;
+    while (maxLength(a, last)>1) {
+        last = n - (end - begin);
+        findRun(a, last, a[i], begin, end);
+        for (int j=i; j<end; j++){
+            moveToEnd(a, n, i+1);
+        }
+        i++;
+    }
+    return last;
+}
+
+bool subsequence(const string a1[], int n1, const string a2[], int n2){
+    int index = -1;
+    for (int i=0; i<n2; i++){
+        if (index <= findMatch(a1, n1, a2[i]))
+            index = findMatch(a1, n1, a2[i]);
+        else{
+            return false;
+        }
+    }
+    return index != -1;
+}
+
+bool nondec (const string a[], int n){
+    string b[n];
+    int last = n;
+    for (int i=0; i<n; i++){
+        b[i]=a[i];
+    }
+    for (int j=0; j<n; j++){
+        if (positionOfMin(b, last) != 0){
+            return false;
+        }
+        moveToEnd(b, n, 0);
+        last--;
+    }
+    return true;
+}
+
+int makeMerger(const string a1[], int n1, const string a2[], int n2, string result[], int max){
+    int pos;
+    if (!nondec(a1, n1) ||  (! nondec(a2, n2)) || (max<n1+n2) ){
+        return -1;
+    }
+    else{
+        
+        string b[n1];
+        for (int i=0; i<n1; i++){
+            b[i]=a1[i];
+            result[i]=a1[i];
+        }
+        for (int j=0; j<n2; j++){
+            pos=separate(b, n1, a2[j]);
+            insert(result, a2[j], n1+1+j, pos);
+        }
+        return n1+n2;
     }
 }
 
+void insert(string a[], string s, int n, int pos){
+    for (int i=n; i>pos; i++){
+        a[i]=a[i-1];
+    }
+    a[pos]=s;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+int separate(string a[], int n, string separator){
+    for (int i=0; i<n; i++){
+        if (a[i].compare(separator) < 0){
+            moveToBeginning(a, n, i);
+        }
+    }
+    for (int i=0; i<n; i++){
+        if (a[i].compare(separator)>=0){
+            return i;
+        }
+    }
+    return n;
+}
