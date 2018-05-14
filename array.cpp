@@ -20,6 +20,15 @@ void insert(string a[], string s, int n, int pos); //a function I created myself
 int separate(string a[], int n, string separator);
 
 int main() {
+    const string x[5] = { "banner", "rhodes", "rogers", "stark", "tchalla" };
+    const string y[4] = { "parker", "rogers", "rogers", "thor" };
+    string z[20];
+    int n = makeMerger(x, 5, y, 4, z, 9);
+    for (int i=0; i<9; i++){
+        cout << z[i] << " ";
+    }
+    cout << endl;
+    cout << n << endl;
 }
 
 int tally(const string a[], int n, string target){
@@ -172,22 +181,25 @@ int makeMerger(const string a1[], int n1, const string a2[], int n2, string resu
         return -1;
     }
     else{
-        
         string b[n1];
         for (int i=0; i<n1; i++){
-            b[i]=a1[i];
             result[i]=a1[i];
         }
+
         for (int j=0; j<n2; j++){
-            pos=separate(b, n1, a2[j]);
-            insert(result, a2[j], n1+1+j, pos);
+            for (int i=0; i<n1; i++){
+                b[i]=result[i];
+            }
+            pos = separate(b, n1+j, a2[j]);
+            insert(result, a2[j], n1+j, pos);
+        
         }
         return n1+n2;
     }
 }
 
 void insert(string a[], string s, int n, int pos){
-    for (int i=n; i>pos; i++){
+    for (int i=n; i>pos; i--){
         a[i]=a[i-1];
     }
     a[pos]=s;
