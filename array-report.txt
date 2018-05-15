@@ -1,9 +1,10 @@
 Part I: Obstacles I encountered
-The most difficult function to implement is makeMerger for me. I tried for a while to find the correct way to implement this function. Also, there are many extreme cases to consider, and it is very easy to miss one or two, for which I lost two points in project 3.
+The most difficult function to implement is makeMerger for me. I tried for a while to find the correct way to implement this function. Fortunately I found a way to implement the function without creating any new array and hopefully get the extra credits. Also, there are many extreme cases to consider, and it is very easy to miss one or two, for which I lost two points in project 3.
 
 Part II: Test Data and Results
-    int b;
-    int e;
+1. Code for testing:
+    int b = -1;
+    int e = -1;
     string folks[8] = {
         "parker", "thor", "stark", "romanoff",
         "banner", "tchalla", "rhodes", "rogers"
@@ -13,11 +14,13 @@ Part II: Test Data and Results
         "thor", "romanoff", "parker", "parker", "stark", "stark", "stark", "parker", "parker"
     };
     string cast[5] = { "parker", "thor", "stark", "banner", "romanoff" };
+    string cast2[3] = { "parker", "thor", "stark"};
     string roles[4] = { "parker", "thor", "tchalla", "rhodes" };
-    string big[10] = { "parker", "thor", "stark", "banner", "romanoff", "stark" };
+    string professors[2] = {"smallberg", "nachenberg"};
+    string big[10] = { "parker", "thor", "stark", "banner", "romanoff", "stark", "stark" };
     string little1[10] = { "thor", "banner", "romanoff" };
     string little2[10] = { "stark", "thor" };
-    string little3[10] = { "thor", "stark", "stark" };
+    string little3[10] = { "thor", "stark", "stark", "stark"};
     string little4[10] = { "thor", "thor", "stark" };
     string x[5] = { "banner", "rhodes", "rogers", "stark", "tchalla" };
     string y[4] = { "parker", "rogers", "rogers", "thor" };
@@ -25,29 +28,191 @@ Part II: Test Data and Results
     string f[6] = { "rhodes", "banner", "stark", "parker", "thor", "rogers" };
     string g[4] = { "romanoff", "rogers", "thor", "banner" };
 
+2. Tested functions, cases, and results:
+
 int tally(const string a[], int n, string target);
-Case 0: tally(d, -1, thor);
+
+Case 0: tally(d, -1, "thor"); //n being negative
 return -1;
-Case 1: tally(d, 0, thor);
+Case 1: tally(d, 0, "thor"); //n equals 0
 return 0;
-Case 1: tally(d, 9, thor);
+Case 2: tally(d, 9, "jasper"); //no such element is found
+return 0;
+Case 3: tally(d, 9, "thor"); //1 such element exists
 return 1;
-
-
-
-
-
+Case 4: tally(d, 9, "parker"); //more than one such element exist
+return 4; //the earliest appearance of such element
+Case 5: tally(d, 5, "parker"); //more than one such element exist in the whole array, but we are not interested in all of them
+return ;
 
 int findMatch(const string a[], int n, string target);
+
+Case 0: findMatch(d, -1, "parker"); //n being negative
+return -1;
+
+Case 1: findMatch(d, 0, "parker"); //n equals 0
+return -1; //since there is no such string
+
+Case 2: findMatch(d, 9, "jasper"); //no such element is found
+return -1;
+
+Case 3: findMatch(d, 9, "romanoff"); //1 such element exists
+return 1;
+
+Case 4: findMatch(d, 9, "stark"); //more than one such element exist
+return 4;
+
+Case 5: findMatch(d, 4, "stark"); //more than one such element exist in the whole array, but we are not interested in all of them
+return -1; //actually no such element exists in the range we concerned about
+
 bool findRun(const string a[], int n, string target, int& begin, int& end);
+(Note: In the following tests, true is represented by 1, false is represented by 0; b, e, when unchanged, are both set to -1)
+
+Case 0: findRun(d, -1, "parker", b, e); //n=-1
+Result: 
+b1= 0
+b= -1
+e= -1
+
+Case 1: findRun(d, 0, "parker", b, e); //n=0, a special case of no such element exists
+Result: 
+b1= 0
+b= -1
+e= -1
+
+Case 2: findRun(d, 9, "jasper", b, e); //no such element exists
+Result: 
+b1= 0
+b= -1
+e= -1
+
+Case 3: findRun(d, 9, "romanoff", b, e); //only one such element exists
+Result: 
+b1= 1
+b= 1
+e= 1
+
+Case 4: findRun(d, 9, "stark", b, e); //more than 1 such element exist in a row, but there is no repetition
+Result: 
+b1= 1
+b= 4
+e= 6
+
+Case 5: findRun(d, 5, "stark", b, e); //more than 1 such element exist in a row, but not all of them are concerned by us
+Result: 
+b1= 1
+b= 4
+e= 4
+
+Case 6: findRun(d, 9, "parker", b, e); //more than 1 such element exist in a row, and there is repetition
+Result: 
+b1= 1
+b= 2
+e= 3
+
 int positionOfMin(const string a[], int n);
+
+Case 1: positionOfMin(people, 0); //no element to evaluate
+return -1;
+
+Case 2: positionOfMin(people, 5); //a standard case
+return 3;
+
+Case 3: positionOfMin(people, 3); //not all elements in the array are concerned
+return 0;
+
 int moveToEnd(string a[], int n, int pos);
+
+Case 0: moveToEnd(people, 0, 1) //no array to move
+Result: 
+parker thor stark banner romanoff //remains unchanged
+1
+
+Case 1: moveToEnd(people, 5, 1); //move the 1st element to the end
+Result: 
+parker stark banner romanoff thor 
+1
+
+Case 2: moveToEnd(people, 5, 4); //move the last element to the end
+Result: 
+parker thor stark banner romanoff //remains unchanged
+4
+
 int moveToBeginning(string a[], int n, int pos);
+Case 0: moveToBeginning(people, 0, 1) //no array to move
+Result: 
+parker thor stark banner romanoff //remains unchanged
+1
+
+Case 1: moveToBeginning(people, 5, 4); //move the 4th element to the beginning
+Result: 
+romanoff parker thor stark banner 
+4
+
+Case 2: moveToBeginning(people, 5, 4); //move the first (0th) element to the beginning
+Result: 
+parker thor stark banner romanoff //remains unchanged
+0
+
 int findDifference(const string a1[], int n1, const string a2[], int n2);
-int maxLength(string a[], int n); 
+
+Case 1: findDifference(cast, 5, professors, 4); //the first element is different
+return 0;
+
+Case 2: findDifference(cast, 5, roles, 4); //a standard case
+return 2;
+
+Case 3: findDifference(cast, 5, cast2, 3); //one is another truncated tail elements
+return 4;
+
 int eliminateDups(string a[], int n);
+
+Case 0: eliminateDups(people, 5); //no duplicate elements, supposed to remain unchanged
+Result: 
+parker thor stark banner romanoff 
+5
+
+Case 1: eliminateDups(d, 9); //a standard testing case
+Result: 
+thor romanoff parker stark parker parker stark parker stark 
+5
+
 bool subsequence(const string a1[], int n1, const string a2[], int n2);
-bool nondec(string a[], int n);
+
+Case 0: subsequence(little1, 3, empty, 0); //a2 is empty
+return true;
+Case 1: b1 = subsequence(big, 6, little1, 3); //a standard testing case
+return true;
+bool b2 = subsequence(big, 6, little2, 2); //contain the elements, but not in the same order
+return false;
+bool b3 = subsequence(d, 9, little3, 4);  //contain multiple same elements in a row
+return true;
+bool b4 = subsequence(big, 6, little4, 3); //contain multiple same elements in a row
+return false;
+
 int makeMerger(const string a1[], int n1, const string a2[], int n2, string result[], int max);
-void insert(string a[], string s, int n, int pos);
+
+Case 0: makeMerger(empty, 0, y, 4, z, 20); //one of the arrays is empty
+Result: 
+parker rogers rogers thor 
+4
+
+Case 1: makeMerger(x, 5, y, 4, z, 20); //a standard testing case
+Result: 
+banner parker rhodes rogers rogers rogers stark tchalla thor 
+9
+
 int separate(string a[], int n, string separator);
+
+Case 1: separate(f, 6, "romanoff"); //separator not in the array
+Result: 
+rogers parker banner rhodes stark thor 
+4
+
+Case 2: separate(g, 4, "rogers"); //separator actually in the array
+Result: 
+banner rogers romanoff thor 
+1
+
+
+

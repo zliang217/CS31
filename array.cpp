@@ -20,8 +20,9 @@ void insert(string a[], string s, int n, int pos); //a function I created myself
 int separate(string a[], int n, string separator);
 
 int main() {
-    int b;
-    int e;
+    int b = -1;
+    int e = -1;
+    string empty [0] = {};
     string folks[8] = {
         "parker", "thor", "stark", "romanoff",
         "banner", "tchalla", "rhodes", "rogers"
@@ -31,40 +32,41 @@ int main() {
         "thor", "romanoff", "parker", "parker", "stark", "stark", "stark", "parker", "parker"
     };
     string cast[5] = { "parker", "thor", "stark", "banner", "romanoff" };
+    string cast2[3] = { "parker", "thor", "stark"};
     string roles[4] = { "parker", "thor", "tchalla", "rhodes" };
-    string big[10] = { "parker", "thor", "stark", "banner", "romanoff", "stark" };
+    string professors[2] = {"smallberg", "nachenberg"};
+    string big[10] = { "parker", "thor", "stark", "banner", "romanoff", "stark", "stark" };
     string little1[10] = { "thor", "banner", "romanoff" };
     string little2[10] = { "stark", "thor" };
-    string little3[10] = { "thor", "stark", "stark" };
+    string little3[10] = { "thor", "stark", "stark", "stark"};
     string little4[10] = { "thor", "thor", "stark" };
     string x[5] = { "banner", "rhodes", "rogers", "stark", "tchalla" };
     string y[4] = { "parker", "rogers", "rogers", "thor" };
     string z[20];
     string f[6] = { "rhodes", "banner", "stark", "parker", "thor", "rogers" };
     string g[4] = { "romanoff", "rogers", "thor", "banner" };
-    cout << "The function you want to call: ";
-    string function;
-    cin >> function;
+    cout << "Result: " << endl;
+    string function= "subsequence";
     if (function == "tally"){
-        int n = tally(d, 0, "thor");
-        cout << n <<endl;
+        int n = tally(d, 9, "parker");
+        cout << n << endl;
     }
     else if (function == "findMatch"){
-        int n = findMatch(d, 9, "parker" );
-        cout << n <<endl;
+        int n = findMatch(d, 4, "stark" );
+        cout << n << endl;
     }
     else if (function == "findRun"){
         bool b1 = findRun(d, 9, "parker", b, e);
-        cout << b1 << endl;
-        cout << b << endl;
-        cout << e << endl;
+        cout << "b1= " << b1 << endl;
+        cout << "b= " << b << endl;
+        cout << "e= " << e << endl;
     }
     else if (function == "positionOfMin"){
-        int n = positionOfMin(people, 5);
+        int n = positionOfMin(people, 3);
         cout << n << endl;
     }
     else if (function == "moveToEnd"){
-        int n = moveToEnd(people, 5, 1);
+        int n = moveToEnd(people, 5, 4);
         for (int j=0; j<5; j++){
             cout << people[j] << " ";
         }
@@ -72,7 +74,7 @@ int main() {
         cout << n << endl;
     }
     else if (function == "moveToBeginning"){
-        int n = moveToBeginning(people, 5, 1);
+        int n = moveToBeginning(people, 5, 4);
         for (int j=0; j<5; j++){
             cout << people[j] << " ";
         }
@@ -80,38 +82,27 @@ int main() {
         cout << n << endl;
     }
     else if (function == "findDifference"){
-        string cast[5] = { "parker", "thor", "stark", "banner", "romanoff" };
-        string roles[4] = { "parker", "thor", "tchalla", "rhodes" };
-        int k = findDifference(cast, 5, roles, 4);
+        int k = findDifference(cast, 5, cast2, 3);
         cout << k << endl;
-        int m = findDifference(cast, 2, roles, 1);
-        cout << m << endl;
     }
     else if (function == "eliminateDups" ){
-      
-        string d[10] = {
-            "thor", "romanoff", "parker", "parker", "jasper", "stark", "stark", "stark", "parker", "parker"
-        };
-        int p = eliminateDups(d, 10);
-        for (int j=0; j<10; j++){
+        int p = eliminateDups(d, 9);
+        for (int j=0; j<9; j++){
             cout << d[j] << " ";
         }
         cout << endl;
         cout << p << endl;
     }
     else if (function == "subsequence" ){
-        string s;
-        getline(cin, s);
-        int i;
-        cin >> i;
-        bool b1 = subsequence(big, 6, little1, 3);  // returns true
-        bool b2 = subsequence(big, 6, little2, 2);  // returns false
-        bool b3 = subsequence(big, 6, little3, 3);  // returns true
-        bool b4 = subsequence(big, 6, little4, 3);  // returns false
-        cout << b1 << " " << b2 << " " << b3 << " " << b4 << " " << endl;
+        bool b0 = subsequence(little1, 3, empty, 0);
+        bool b1 = subsequence(big, 6, little1, 3);
+        bool b2 = subsequence(big, 6, little2, 2);
+        bool b3 = subsequence(d, 9, little3, 4);
+        bool b4 = subsequence(big, 6, little4, 3);
+        cout << b0 << " " << b1 << " " << b2 << " " << b3 << " " << b4 << " " << endl;
     }
     else if (function == "makeMerger"){
-        int n = makeMerger(x, 5, y, 4, z, 20);
+        int n = makeMerger(empty, 0, y, 4, z, 20);
         for (int j=0; j<n; j++){
             cout << z[j] << " ";
         }
@@ -120,9 +111,9 @@ int main() {
         
     }
     else if (function == "separate"){
-        int r = separate(f, 6, "romanoff");
-        for (int j=0; j<6; j++){
-            cout << f[j] << " ";
+        int r = separate(g, 4, "rogers");
+        for (int j=0; j<4; j++){
+            cout << g[j] << " ";
         }
         cout << endl;
         cout << r << endl;
@@ -132,6 +123,9 @@ int main() {
 int tally(const string a[], int n, string target){
     if (n<0){
         return -1; //if n is negative return -1
+    }
+    else if (n==0){
+        return 0;
     }
     else{
         int count=0;
@@ -146,7 +140,7 @@ int tally(const string a[], int n, string target){
 
 int findMatch(const string a[], int n, string target){
     if (n == 0){
-        return 0; //return 0 for empty string
+        return -1; //return -1 for empty string, since there is no such element
     }
     
     for (int i=0; i<n; i++){
@@ -246,12 +240,20 @@ int eliminateDups(string a[], int n){
 }
 
 bool subsequence(const string a1[], int n1, const string a2[], int n2){
+    if (n2 == 0){
+        return true;
+    }
     int index = -1;
     for (int i=0; i<n2; i++){
-        if (index <= findMatch(a1, n1, a2[i])) //see if elements of a2 appear in a1 in the original order
-            index = findMatch(a1, n1, a2[i]);
-        else{
+        if (tally(a1, n1, a1[findMatch(a1, n1, a2[i])])<tally(a2, n2, a2[i])){
             return false;
+        }
+        else{
+            if (index <= findMatch(a1, n1, a2[i])) //see if elements of a2 appear in a1 in the original order
+                index = findMatch(a1, n1, a2[i]);
+            else{
+                return false;
+            }
         }
     }
     return index != -1;
@@ -323,7 +325,7 @@ void insert(string a[], string s, int n, int pos){ //an auxiliary function I wro
 
 int separate(string a[], int n, string separator){
     for (int i=0; i<n; i++){
-        if (a[i].compare(separator) < 0){
+        if (a[i].compare(separator) <= 0){
             moveToBeginning(a, n, i);
         }
     } //move all the elements that are less than the seperator to the beginning
