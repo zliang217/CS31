@@ -1,0 +1,53 @@
+Part I: Obstacles I encountered
+The most difficult function to implement is makeMerger for me. I tried for a while to find the correct way to implement this function. Also, there are many extreme cases to consider, and it is very easy to miss one or two, for which I lost two points in project 3.
+
+Part II: Test Data and Results
+    int b;
+    int e;
+    string folks[8] = {
+        "parker", "thor", "stark", "romanoff",
+        "banner", "tchalla", "rhodes", "rogers"
+    };
+    string people[5] = { "parker", "thor", "stark", "banner", "romanoff" };
+    string d[9] = {
+        "thor", "romanoff", "parker", "parker", "stark", "stark", "stark", "parker", "parker"
+    };
+    string cast[5] = { "parker", "thor", "stark", "banner", "romanoff" };
+    string roles[4] = { "parker", "thor", "tchalla", "rhodes" };
+    string big[10] = { "parker", "thor", "stark", "banner", "romanoff", "stark" };
+    string little1[10] = { "thor", "banner", "romanoff" };
+    string little2[10] = { "stark", "thor" };
+    string little3[10] = { "thor", "stark", "stark" };
+    string little4[10] = { "thor", "thor", "stark" };
+    string x[5] = { "banner", "rhodes", "rogers", "stark", "tchalla" };
+    string y[4] = { "parker", "rogers", "rogers", "thor" };
+    string z[20];
+    string f[6] = { "rhodes", "banner", "stark", "parker", "thor", "rogers" };
+    string g[4] = { "romanoff", "rogers", "thor", "banner" };
+
+int tally(const string a[], int n, string target);
+Case 0: tally(d, -1, thor);
+return -1;
+Case 1: tally(d, 0, thor);
+return 0;
+Case 1: tally(d, 9, thor);
+return 1;
+
+
+
+
+
+
+int findMatch(const string a[], int n, string target);
+bool findRun(const string a[], int n, string target, int& begin, int& end);
+int positionOfMin(const string a[], int n);
+int moveToEnd(string a[], int n, int pos);
+int moveToBeginning(string a[], int n, int pos);
+int findDifference(const string a1[], int n1, const string a2[], int n2);
+int maxLength(string a[], int n); 
+int eliminateDups(string a[], int n);
+bool subsequence(const string a1[], int n1, const string a2[], int n2);
+bool nondec(string a[], int n);
+int makeMerger(const string a1[], int n1, const string a2[], int n2, string result[], int max);
+void insert(string a[], string s, int n, int pos);
+int separate(string a[], int n, string separator);
