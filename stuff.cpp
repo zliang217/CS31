@@ -14,7 +14,7 @@ int startWithEmpty (istream& inf);
 int main(){
     ifstream infile("/Users/apple/Desktop/Zhengjun Liang/College/Academics/Classes/CS/ComSci 31/Project 5/Project 5/data.txt");
     ofstream outfile("/Users/apple/Desktop/Zhengjun Liang/College/Academics/Classes/CS/ComSci 31/Project 5/Project 5/results.txt");
-    int n = stuff(25, infile, outfile);
+    int n = stuff(40, infile, outfile);
     //int n = startWithEmpty(infile);
     cout << n << endl;
 }
@@ -125,16 +125,17 @@ bool lastRealChar (istream& inf, int num){ //used to verify that whether the cur
 
 int startWithEmpty (istream& inf){ //seems like it works
     char c;
-    char pString[140] = "P# ";
+    char pString1 [140] = "P# ";
+    char pString2 [140] = {'P', '#', '\n', '\0'};
     int count = 0;
     while (inf.get(c)){
         if (c=='#'){
             for (int i=0; i<3; i++){
                 inf.get(c);
-                if (c == pString[i]){
+                if (c == pString1[i] || c==pString2[i]){
                     count++;
                 }
-                else{
+                else if (inf.get(c)){// make sure that this is not the last character
                     inf.clear(); //clear up
                     inf.seekg(0, ios::beg); //back to the beginning
                     return count;
@@ -187,7 +188,6 @@ bool newParagraph (istream& inf, int num, int n){ //verify that whether we shoul
     return hasP;
 }
 
-//deal with the case that the first character is a newparagraph or ' ' or '\n'
 int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
     int returnNum = 0;
     if (lineLength < 1){
@@ -196,9 +196,9 @@ int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
     else{
         char c;
         int outCount = 0; //stores the num of chars we have gone through in the outputfile
-        int inCount = startWithEmpty(inf)-1; //stores the num of chars we have gone through in the input file
+        int inCount = startWithEmpty(inf); //stores the num of chars we have gone through in the input file
         int lineLen = 0; //stores the num of chars in a line we have gone through in the output file
-        for (int i=0; i<startWithEmpty(inf)-1; i++){
+        for (int i=0; i<inCount; i++){
             inf.get(c);
         }
         while (inf.get(c)){
@@ -231,12 +231,27 @@ int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
                             }
                         }
                         else{ //chaging line if next word portion won't fit in the current line
-                            if (lineLen+nextWordPortion(inf, inCount)+1>lineLength && lineLen!=0){
-                                outf << '\n';
-                                lineLen = 0;
+                            int i = 1;
+                            while (getPreviousNChar(inf, inCount, i)==' ' || getPreviousNChar(inf, inCount, i)=='\n'){
+                                i++;
                             }
-                            else{
-                                if (lineLen != 0 && lineLen != lineLength-1 && !newParagraph(inf, inCount, 0)){ //if it is the start of a new line or the end of a line, no need to output a space
+                            if (getPreviousNChar(inf, inCount, i) == '?' || getPreviousNChar(inf, inCount, i) == '.'){
+                                if (lineLen+nextWordPortion(inf, inCount)+2>lineLength && lineLen!=0){
+                                    outf << '\n';
+                                    lineLen = 0;
+                                }
+                                else if (lineLen != 0 && lineLen != lineLength-2 && !newParagraph(inf, inCount, i-1)){
+                                    outf << ' ' << ' ';
+                                    outCount+=2;
+                                    lineLen+=2;
+                                }
+                            }
+                            else {
+                                if (lineLen+nextWordPortion(inf, inCount)+1>lineLength && lineLen!=0){
+                                    outf << '\n';
+                                    lineLen = 0;
+                                }
+                                else if (lineLen != 0 && lineLen != lineLength-1 && !newParagraph(inf, inCount, i-1)){
                                     outf << ' ';
                                     outCount++;
                                     lineLen++;
@@ -301,7 +316,6 @@ int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
                     }
                 }
             }
-            
             else if (c == '-'){ //deal with the case that the previous character is '-'
                 if (lineLen+nextWordPortion(inf, inCount)+1>lineLength){
                     outf << '-';
@@ -333,11 +347,11 @@ int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
                     lineLen++;
                     outCount++;
                     return returnNum;
-
                 }
             }
-        inCount++;
+            inCount++;
         }
         return returnNum;
     }
 }
+
