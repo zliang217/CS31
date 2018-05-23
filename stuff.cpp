@@ -9,11 +9,14 @@ char getPreviousNChar (istream& inf, int num, int n); //namely, get the char n i
 char getNextNChar (istream& inf, int num, int n); //namely, get the char n index after the current char, similar to the previous function
 bool newParagraph (istream& inf, int num, int n); //verify that whether we should start a new paragraph, index n added for some flexibility
 bool lastRealChar (istream& inf, int num); //used to verify that whether the current char is the last meaningful char
+int startWithEmpty (istream& inf);
 
 int main(){
     ifstream infile("/Users/apple/Desktop/Zhengjun Liang/College/Academics/Classes/CS/ComSci 31/Project 5/Project 5/data.txt");
     ofstream outfile("/Users/apple/Desktop/Zhengjun Liang/College/Academics/Classes/CS/ComSci 31/Project 5/Project 5/results.txt");
-    stuff(20, infile, outfile);
+    int n = stuff(25, infile, outfile);
+    //int n = startWithEmpty(infile);
+    cout << n << endl;
 }
 
 int nextWordPortion (istream& inf, int num){ //get the length of the word portion following pos
@@ -120,12 +123,45 @@ bool lastRealChar (istream& inf, int num){ //used to verify that whether the cur
     return last;
 }
 
+int startWithEmpty (istream& inf){ //seems like it works
+    char c;
+    char pString[140] = "P# ";
+    int count = 0;
+    while (inf.get(c)){
+        if (c=='#'){
+            for (int i=0; i<3; i++){
+                inf.get(c);
+                if (c == pString[i]){
+                    count++;
+                }
+                else{
+                    inf.clear(); //clear up
+                    inf.seekg(0, ios::beg); //back to the beginning
+                    return count;
+                }
+            }
+            count++;
+        }
+        else if (c ==' ' || c =='\n'){
+            count++;
+        }
+        else{
+            inf.clear(); //clear up
+            inf.seekg(0, ios::beg); //back to the beginning
+            return count;
+        }
+    }
+    inf.clear(); //clear up
+    inf.seekg(0, ios::beg); //back to the beginning
+    return count;
+}
+
 bool newParagraph (istream& inf, int num, int n){ //verify that whether we should start a new paragraph, index n added for some flexibility
     inf.clear(); //n is defined this way: n=0 means verifying whether we should start a paragraph after the current character, and so on
     inf.seekg(0, ios::beg);
     int count = 0;
     char c;
-    char pString[10] = "#P#"; //for convenience
+    char pString[140] = "#P#"; //for convenience
     bool hasP = true; //true by default
     while (inf.get(c)){
         if (count == num+n){
@@ -151,36 +187,7 @@ bool newParagraph (istream& inf, int num, int n){ //verify that whether we shoul
     return hasP;
 }
 
-void startNewParagraph (istream& inf, ostream& outf, int lineLen, int inCount, bool adjPara){
-    char c;
-    if (newParagraph(inf, inCount, 0)){ //if we should start a new paragraph
-        int i=4;
-        while (getNextNChar(inf, inCount, i) == ' ') {
-            i++;
-        } //skip the following #P# and see if there is any more #P# behind it
-        if (newParagraph(inf, inCount, i-1)){ //which means that there is consecutive #P#
-            adjPara=false;
-        }
-        if (adjPara){ //if this is the last of the consecutive #P#, we start a new paragraph now
-            outf << '\n' << '\n';
-            lineLen = 0;
-            for (int i=0; i<3; i++){
-                inf.get(c);
-            } //we skip #P#
-            inCount+=3; //and since we fetched 3 chars in the input file, inCount+=3
-        }
-        else{ //if this is not the last, we'd rather wait than start a new paragraph right now
-            for (int i=0; i<3; i++){
-                inf.get(c);
-            }
-            inCount+=3;
-        }
-    }
-}
-
-//fix the issue of '\n'
-//'\n' followed by ' ' or vice versa
-//what if the end is a paragraph
+//deal with the case that the first character is a newparagraph or ' ' or '\n'
 int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
     int returnNum = 0;
     if (lineLength < 1){
@@ -189,16 +196,19 @@ int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
     else{
         char c;
         int outCount = 0; //stores the num of chars we have gone through in the outputfile
-        int inCount = 0; //stores the num of chars we have gone through in the input file
+        int inCount = startWithEmpty(inf)-1; //stores the num of chars we have gone through in the input file
         int lineLen = 0; //stores the num of chars in a line we have gone through in the output file
+        for (int i=0; i<startWithEmpty(inf)-1; i++){
+            inf.get(c);
+        }
         while (inf.get(c)){
             bool adjPara = true; //set for the case of consecutive #P#
-            if (c == ' '){
+            if (c == ' ' || c == '\n'){
                 if (getPreviousNChar(inf, inCount, 1)==' ' || getPreviousNChar(inf, inCount, 1)=='\n'){
                     if (getNextNChar(inf, inCount, 1)!=' ' && getNextNChar(inf, inCount, 1)!='\n'){ //if the current char is followed by meaningful characters
                         if (newParagraph(inf, inCount, 0)){ //if we should start a new paragraph
                             int i=4;
-                            while (getNextNChar(inf, inCount, i) == ' ') {
+                            while (getNextNChar(inf, inCount, i) == ' ' || getNextNChar(inf, inCount, i) == '\n') {
                                 i++;
                             } //skip the following #P# and see if there is any more #P# behind it
                             if (newParagraph(inf, inCount, i-1)){ //which means that there is consecutive #P#
@@ -225,14 +235,21 @@ int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
                                 outf << '\n';
                                 lineLen = 0;
                             }
+                            else{
+                                if (lineLen != 0 && lineLen != lineLength-1 && !newParagraph(inf, inCount, 0)){ //if it is the start of a new line or the end of a line, no need to output a space
+                                    outf << ' ';
+                                    outCount++;
+                                    lineLen++;
+                                }
+                            }
                         }
                     }
                 }
                 else if (getPreviousNChar(inf, inCount, 1)!=' ' && getPreviousNChar(inf, inCount, 1)!='\n'){
                     if (getNextNChar(inf, inCount, 1)!=' ' && getNextNChar(inf, inCount, 1)!='\n'){
-                        if (newParagraph(inf, inCount, 0)){ //same procesure as above
+                        if (newParagraph(inf, inCount, 0)){ //same procedure as above
                             int i=4;
-                            while (getNextNChar(inf, inCount, i) == ' ') { //what if the input file is empty?
+                            while (getNextNChar(inf, inCount, i) == ' ' || getNextNChar(inf, inCount, i) == '\n') { //what if the input file is empty?
                                 i++;
                             }
                             if (newParagraph(inf, inCount, i-1)){
@@ -261,7 +278,7 @@ int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
                                 lineLen = 0;
                             }
                             else{//if it is the start of a new line, no need to output a space
-                                if (lineLen != 0 && lineLen != lineLength-2){ //if it is the start of a new line, no need to output a space
+                                if (lineLen != 0 && lineLen != lineLength-2 && !newParagraph(inf, inCount, 0)){ //if it is the start of a new line, no need to output a space
                                     outf << ' ' << ' ';
                                     outCount+=2;
                                     lineLen+=2;
@@ -274,19 +291,12 @@ int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
                                 lineLen = 0;
                             }
                             else{
-                                if (lineLen != 0 && lineLen != lineLength-1){ //if it is the start of a new line or the end of a line, no need to output a space
+                                if (lineLen != 0 && lineLen != lineLength-1 && !newParagraph(inf, inCount, 0)){ //if it is the start of a new line or the end of a line, no need to output a space
                                     outf << ' ';
                                     outCount++;
                                     lineLen++;
                                 }
                             }
-                        }
-                    }
-                    else{
-                        if (lineLen != 0 && lineLen != lineLength-1){ //if it is the start of a new line or the end of a line, no need to output a space
-                            outf << ' ';
-                            outCount++;
-                            lineLen++;
                         }
                     }
                 }
@@ -302,39 +312,6 @@ int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
                     outf << '-';
                     outCount++;
                     lineLen++;
-                }
-            }
-            else if (c == '\n'){ //deal with the case that the previous character is '\n'
-                if (getPreviousNChar(inf, inCount, 1)!='\n' && getPreviousNChar(inf, inCount, 1)!=' '){
-                    if (getNextNChar(inf, inCount, 1)!=' ' && getNextNChar(inf, inCount, 1)!='\n'){
-                        if (lineLen+nextWordPortion(inf, inCount)+1>lineLength && lineLen!=0){
-                            outf << '\n';
-                            lineLen = 0;
-                        }
-                        else{
-                            if (getPreviousNChar(inf, inCount, 1) == '?' || getPreviousNChar(inf, inCount, 1) == '.'){
-                                if (lineLen != lineLength-2){
-                                    outf << ' ' << ' ';
-                                    outCount+=2;
-                                    lineLen+=2;
-                                }
-                            }
-                            else{
-                                if (lineLen!=0 && lineLen+1!=lineLength){
-                                    outf << ' ';
-                                    outCount++;
-                                    lineLen++;
-                                }
-                            }
-                        }
-                    }
-                    else{
-                        if (lineLen!=0 && lineLen+1!=lineLength){
-                            outf << ' ';
-                            outCount++;
-                            lineLen++;
-                        }
-                    }
                 }
             }
             else{ //the case that the current character is meaningful
