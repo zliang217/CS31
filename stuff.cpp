@@ -14,7 +14,7 @@ int startWithEmpty (istream& inf);
 int main(){
     ifstream infile("/Users/apple/Desktop/Zhengjun Liang/College/Academics/Classes/CS/ComSci 31/Project 5/Project 5/data.txt");
     ofstream outfile("/Users/apple/Desktop/Zhengjun Liang/College/Academics/Classes/CS/ComSci 31/Project 5/Project 5/results.txt");
-    int n = stuff(40, infile, outfile);
+    int n = stuff(17, infile, outfile);
     //int n = startWithEmpty(infile);
     cout << n << endl;
 }
@@ -343,10 +343,18 @@ int stuff(int lineLength, istream& inf, ostream& outf){ //the required function
                     }
                 }
                 else{ //if this is the last meaningful char, wrap up with printing the last meaningful char and '\n' as required
-                    outf << c << '\n';
-                    lineLen++;
-                    outCount++;
-                    return returnNum;
+                    if (lineLen == lineLength){
+                        outf << '\n' << c << '\n';
+                        lineLen++;
+                        outCount++;
+                        return returnNum;
+                    }
+                    else{
+                        outf << c << '\n';
+                        lineLen++;
+                        outCount++;
+                        return returnNum;
+                    }
                 }
             }
             inCount++;
