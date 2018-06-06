@@ -12,8 +12,11 @@
 #include <random>
 #include <utility>
 #include <cstdlib>
+#include <cassert>
+
 using namespace std;
 
+#define CHECKTYPE(f, t) { (void)static_cast<t>(f); }
 ///////////////////////////////////////////////////////////////////////////
 // Manifest constants
 ///////////////////////////////////////////////////////////////////////////
@@ -684,12 +687,98 @@ int randInt(int min, int max)
     return distro(generator);
 }
 
+#define CHECKTYPE(f, t) { (void)static_cast<t>(f); }
+
+void thisFunctionWillNeverBeCalled()
+{
+    // If the student deleted or changed the interfaces to the public
+    // functions, this won't compile.  (This uses magic beyond the scope
+    // of CS 31.)
+    
+    Dinosaur(static_cast<Valley*>(0), 1, 1);
+    CHECKTYPE(&Dinosaur::row,  int  (Dinosaur::*)() const);
+    CHECKTYPE(&Dinosaur::col,  int  (Dinosaur::*)() const);
+    CHECKTYPE(&Dinosaur::move, void (Dinosaur::*)());
+    
+    Player(static_cast<Valley*>(0), 1, 1);
+    CHECKTYPE(&Player::row,     int  (Player::*)() const);
+    CHECKTYPE(&Player::col,     int  (Player::*)() const);
+    CHECKTYPE(&Player::age,     int  (Player::*)() const);
+    CHECKTYPE(&Player::isDead,  bool (Player::*)() const);
+    CHECKTYPE(&Player::stand,   void (Player::*)());
+    CHECKTYPE(&Player::move,    void (Player::*)(int));
+    CHECKTYPE(&Player::shoot,   bool (Player::*)(int));
+    CHECKTYPE(&Player::setDead, void (Player::*)());
+    
+    Valley(1, 1);
+    CHECKTYPE(&Valley::rows,            int     (Valley::*)() const);
+    CHECKTYPE(&Valley::cols,            int     (Valley::*)() const);
+    CHECKTYPE(&Valley::player,          Player* (Valley::*)() const);
+    CHECKTYPE(&Valley::dinosaurCount,   int     (Valley::*)() const);
+    CHECKTYPE(&Valley::numDinosaursAt,  int     (Valley::*)(int,int) const);
+    CHECKTYPE(&Valley::display,         void    (Valley::*)(string) const);
+    CHECKTYPE(&Valley::addDinosaur,     bool    (Valley::*)(int,int));
+    CHECKTYPE(&Valley::addPlayer,       bool    (Valley::*)(int,int));
+    CHECKTYPE(&Valley::destroyDinosaur, bool    (Valley::*)(int,int));
+    CHECKTYPE(&Valley::moveDinosaurs,   bool    (Valley::*)());
+    
+    Game(1, 1, 1);
+    CHECKTYPE(&Game::play, void (Game::*)());
+}
+
+void doBasicTests()
+{
+    {
+        Valley v(10, 20);
+        assert(v.addPlayer(2, 6));
+        Player* pp = v.player();
+        assert(pp->row() == 2  &&  pp->col() == 6  && ! pp->isDead());
+        pp->move(UP);
+        assert(pp->row() == 1  &&  pp->col() == 6  && ! pp->isDead());
+        pp->move(UP);
+        assert(pp->row() == 1  &&  pp->col() == 6  && ! pp->isDead());
+        pp->setDead();
+        assert(pp->row() == 1  &&  pp->col() == 6  && pp->isDead());
+    }
+    {
+        Valley v(2, 2);
+        assert(v.addPlayer(1, 1));
+        assert(v.addDinosaur(2, 2));
+        Player* pp = v.player();
+        assert(v.moveDinosaurs());
+        assert( ! pp->isDead());
+        for (int k = 0; k < 1000  &&  v.moveDinosaurs(); k++)
+            ;
+        assert(pp->isDead());
+    }
+    {
+        Valley v(1, 40);
+        assert(v.addPlayer(1, 1));
+        assert(v.addDinosaur(1, 40));
+        assert(v.addDinosaur(1, 40));
+        assert(v.addDinosaur(1, 39));
+        assert(v.dinosaurCount() == 3  &&  v.numDinosaursAt(1, 40) == 2);
+        Player* pp = v.player();
+        for (int k = 0; k < 1000  &&  v.dinosaurCount() != 0; k++)
+            pp->shoot(RIGHT);
+        assert(v.dinosaurCount() == 0);
+        assert(v.addDinosaur(1, 40));
+        for (int k = 0; k < 38; k++)
+        {
+            v.moveDinosaurs();
+            pp->stand();
+        }
+        assert(v.dinosaurCount() == 1);
+    }
+    cout << "Passed all basic tests" << endl;
+}
 ///////////////////////////////////////////////////////////////////////////
 //  main()
 ///////////////////////////////////////////////////////////////////////////
 
 int main()
 {
+    doBasicTests();
     // Create a game
     // Use this instead to create a mini-game:   Game g(3, 3, 2);
     Game g(3, 3, 2);
@@ -746,3 +835,4 @@ void clearScreen()  // will just write a newline in an Xcode output window
 }
 
 #endif
+
